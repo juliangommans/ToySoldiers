@@ -153,7 +153,7 @@ public class GridManager : MonoBehaviour {
 
 	Sprite RandomTile (){
 		int randomIndex = Random.Range (0, tileSprites.Length-1);
-		Debug.Log ("Randy = " + randomIndex);
+//		Debug.Log ("Randy = " + randomIndex);
 		return tileSprites [randomIndex];
 	}
 
@@ -173,8 +173,7 @@ public class GridManager : MonoBehaviour {
 
 	public void SetupScene (string tileset)
 	{
-		tileSprites = Resources.LoadAll<Sprite>(tileset); 
-		Debug.Log ("we should be good: " + tileSprites.Length);
+		tileSprites = Resources.LoadAll<Sprite>(tileset);
 		//Set our list of gridpositions.
 		InitialiseList ();
 		//Build HexGrid

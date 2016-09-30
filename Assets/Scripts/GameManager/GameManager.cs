@@ -15,15 +15,17 @@ public class GameManager : MonoBehaviour {
 	}
 		
 //	private GameObject player;
-	private GameState gameState;
-	private CombatManager combatManager;
+	public GameState gameState;
+	public CombatManager combatManager;
+	public UiManager ui;
+
 	private bool gridSetup;
 
 //	public GameObject Player { get {return player;} }
-	public string Test = "testing";
-
 	void Awake() {
 		Instance = this;
+		gridSetup = false;
+		ui = GetComponent<UiManager> ();
 //		player = (GameObject)Instantiate(Resources.Load("prefabs/Player"));
 		gameState = GameState.Paused;
 		// ATM this is for testing - TODO change to when someone enters a zone.
@@ -45,7 +47,7 @@ public class GameManager : MonoBehaviour {
 		case GameState.SetupBattlefield:
 			if (!gridSetup) {
 				this.GetComponent<GridManager> ().SetupScene ("HexTiles/GrassTiles");
-				gridSetup = false;
+				gridSetup = true;
 			}
 			gameState = GameState.Combat;
 			break;

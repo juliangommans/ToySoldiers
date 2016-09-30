@@ -5,16 +5,13 @@ using System.Reflection;
 
 public class Player : BaseCharacter {
 
-	private const string name = "Player"; // input can effect this later
+	private const string name = "Hoolio"; // input can effect this later
 
-//	public Player ()
-//		:base (){
-//
-//	}
-	public void BuildPlayer() {
-		Debug.Log (this.gameObject);
+	public Player ()
+		:base (){
 		this.CharacterName = name;
-//		this.Skills.Add (new TouchOfFlame (this.gameObject));
+		this.AddSkill (new IceBolt());
 	}
+
 		
 }

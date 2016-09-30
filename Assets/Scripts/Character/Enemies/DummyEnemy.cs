@@ -10,13 +10,13 @@ public class DummyEnemy : BaseCharacter {
 	public DummyEnemy ()
 		:base (){
 
-		this.BaseHealth = 100;
-		this.BaseMaxHealth = 100;
-		this.BaseAttack = 10;
-		this.BaseDefense = 10;
-		this.BaseEnergy = 10;
-		this.BaseResistance = 10;
-		this.BaseSpeed = 10;
+		this.Stats.BaseHealth = 100;
+		this.Stats.BaseMaxHealth = 100;
+		this.Stats.BaseAttack = 10;
+		this.Stats.BaseDefense = 10;
+		this.Stats.BasePower = 10;
+		this.Stats.BaseResistance = 10;
+		this.Stats.BaseSpeed = 10;
 
 		this.CharacterName = name;
 //		this.Skills.Add (new TouchOfFlame (this.gameObject));

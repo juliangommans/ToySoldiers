@@ -9,6 +9,7 @@ public class HighlightBlack : MonoBehaviour {
 	public Texture2D characterTexture2D;
 
 	void Start () {
+		color = new Color (0, 255, 255, 255);
 		triggerColor = false;
 		sprite = this.GetComponent<SpriteRenderer>().sprite;
 	}
@@ -25,7 +26,7 @@ public class HighlightBlack : MonoBehaviour {
 			int x = 0;
 			while (x < texture.width)
 			{
-				Debug.Log ("red = " + copiedTexture.GetPixel (x, y).r + " | green = " + copiedTexture.GetPixel (x, y).g + " | blue = " + copiedTexture.GetPixel (x, y).b);
+//				Debug.Log ("red = " + copiedTexture.GetPixel (x, y).r + " | green = " + copiedTexture.GetPixel (x, y).g + " | blue = " + copiedTexture.GetPixel (x, y).b);
 				if (BlackishChecker(copiedTexture.GetPixel (x, y))) {
 					texture.SetPixel (x, y, color);
 				} else {
@@ -56,8 +57,10 @@ public class HighlightBlack : MonoBehaviour {
 		bool green = pixel.g <= 0.099;
 		bool alpha = pixel.a >= 0.99;
 		if (red && blue && green && alpha) {
+//			Debug.Log ("true it's black");
 			return true;
 		} else {
+//			Debug.Log ("false it's not black");
 			return false;
 		}
 	}

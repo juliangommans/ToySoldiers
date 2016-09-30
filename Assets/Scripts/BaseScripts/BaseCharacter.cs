@@ -3,270 +3,134 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
+// Becoming far too bloated, maybe move all stats stuff out into a stats script/class?
+
 public class BaseCharacter : MonoBehaviour {
 
+	// Background info
+	private GameObject gameManager;
+
 	// Character skills/abilities etc.
-	private string characterName;
-	private List<BaseSkill> skills;
-	private BaseSkill selectedSkill;
-
-	// Character base stats
-	private int health;
-	private int baseHealth;
-	private int maxHealth;
-	private int baseMaxHealth;
-	private int attack;
-	private int baseAttack;
-	private int defense;
-	private int baseDefense;
-	private int energy;
-	private int baseEnergy; // (special attack)
-	private int resistance;
-	private int baseResistance ;// (special defence)
-	private int speed;
-	private int baseSpeed;
-
-	// Character advanced stats
-	private int shield; // (absorbs damage, resets each round)
-	private int baseShield;
-	private int retaliations; // (defaults to one retaliation a round)
-	private int baseRetaliations;
-	private int retaliationDamage; // (defaults to 50%)
-	private int baseRetaliationDamage;
-	private int comboPoints; // (starts at zero, once it reaches max, 4, attacks do extra things)
-	private int baseComboPoints;
-	private int maxComboPoints;
-	private int baseMaxComboPoints;
-	private int actionPoints; // (used on abilities, start with 4 max)
-	private int baseActionPoints;
-	private int maxActionPoints;
-	private int baseMaxActionPoints;
-	private int gloabalCooldownReduction;
-	private int baseGlobalCooldownReduction;
+	public string CharacterName {get; set;}
+	public List<BaseSkill> Skills {get; set;}
+	public BaseSkill SelectedSkill { get; set; }
+	public BaseStats Stats { get; set; }
 
 	// Character passive modifiers - might need to impliment/learn about c# lists
 	public List<GameObject> buffs;
 	public List<GameObject> deBuffs;
 
 	// Interactive variables
-	private bool madeSelection;
-	private bool turnComplete;
-	private bool yourTurn;
-	private GameObject currentTarget;
-
-	// Experience and OOC stats
-	private int level;
-	private int experience;
-
-	// Getters and Setters
-	public string CharacterName {get; set;}
-	public List<BaseSkill> Skills {get; set;}
-	public BaseSkill SelectedSkill { get; set; }
-
 	public bool MadeSelection { get; set; }
 	public bool TurnComplete { get; set; }
 	public bool YourTurn { get; set; }
 	public GameObject CurrentTarget { get; set; }
+	public float MoveSpeed { get; set; }
+	public GameObject Location { get; set; }
+	public string Controller { get; set; } // Player - Computer
 
-	public int Health {get; set;}
-	public int BaseHealth { get; set; }
-	public int MaxHealth {get; set;}
-	public int BaseMaxHealth { get; set; }
-	public int Attack {get; set;}
-	public int BaseAttack {get; set;}
-	public int Defense {get; set;}
-	public int BaseDefense {get; set;}
-	public int Energy {get; set;}
-	public int BaseEnergy {get; set;}
-	public int Resistance {get; set;}
-	public int BaseResistance {get; set;}
-	public int Speed {get; set;}
-	public int BaseSpeed {get; set;}
+	//Movement
+	private bool moving;
+	private GameObject destination;
+	private float moveSpeed; //Howmany hexs you can move per action point (0.5,1 or 1.5)
+	private float moveAnimationSpeed;
+	private GameObject location;
 
-	public int Shield {get; set;}
-	public int BaseShield { get; set; }
-	public int Resilience {get; set;}
-	public int BaseResilience {get; set;}
-	public int Retaliations {get; set;}
-	public int BaseRetaliations {get; set;}
-	public int RetaliationDamage {get; set;}
-	public int BaseRetaliationDamage {get; set;}
-	public int ComboPoints {get; set;}
-	public int BaseComboPoints {get; set;}
-	public int MaxComboPoints {get; set;}
-	public int BaseMaxComboPoints {get; set;}
-	public int ActionPoints {get; set;}
-	public int BaseActionPoints {get; set;}
-	public int MaxActionPoints {get; set;}
-	public int BaseMaxActionPoints {get; set;}
-	public int GlobalCooldownReduction {get; set;}
-	public int BaseGlobalCooldownReduction {get; set;}
-
+	// Experience and OOC stats
 	public int Level {get; set;}
 	public int Experience {get; set;}
 
+	void Awake(){
+		gameManager = GameObject.Find ("GameManager");
+	}
+
 	public BaseCharacter (){
 		CharacterName = "Character";
+		Stats = new BaseStats ();
 		Skills = new List<BaseSkill>();
-		MadeSelection = false;
 
-		BaseHealth = 300;
-		BaseMaxHealth = 300;
-		BaseAttack = 30;
-		BaseDefense = 30;
-		BaseEnergy = 30;
-		BaseResistance = 30;
-		BaseSpeed = 30;
+		Stats.BaseHealth = 300;
+		Stats.BaseMaxHealth = 300;
+		Stats.BaseAttack = 30;
+		Stats.BaseDefense = 30;
+		Stats.BasePower = 30;
+		Stats.BaseResistance = 30;
+		Stats.BaseSpeed = 30;
 
-		BaseShield = 5;
-		BaseResilience = 0;
-		BaseRetaliations = 1;
-		BaseRetaliationDamage = 5;
-		BaseComboPoints = 0;
-		BaseMaxComboPoints = 3;
-		BaseActionPoints = 0;
-		BaseMaxActionPoints = 4;
-		BaseGlobalCooldownReduction = 0;
+		Stats.BaseShield = 5;
+		Stats.BaseResilience = 0;
+		Stats.BaseRetaliations = 1;
+		Stats.BaseRetaliationDamage = 5;
+		Stats.BaseComboPoints = 0;
+		Stats.BaseMaxComboPoints = 3;
+		Stats.BaseActionPoints = 4;
+		Stats.BaseMaxActionPoints = 4;
+		Stats.BaseGlobalCooldownReduction = 0;
+
+		MoveSpeed = 0.5f;
 
 		Level = 0;
 		Experience = 0;
+		moveAnimationSpeed = 1.5f;
 	}
 
 	// This should be called whenever there is a change to anyones stats (maybe once per update)
 	// i.e. keeps the % increase relevent to the current state of the game
 	public void ImplimentTraits () { 
-		ResetStats();
+		Stats.ResetStats();
 	}
 
 	// This should be called by characters when adding a skill
 	public void AddSkill (BaseSkill skill) {
 		skill.Owner = this.gameObject;
-		skills.Add (skill);
+		Skills.Add (skill);
 	}
 
-	void UpdateStats (string stat, float percent){
-		switch (stat) {
-		// Base stats
-		case "Health":
-			Health += (int)(BaseHealth * percent);
-			break;
-		case "MaxHealth":
-			MaxHealth += (int)(BaseMaxHealth * percent);
-			break;
-		case "Attack":
-			Attack += (int)(BaseAttack * percent);
-			break;
-		case "Defense":
-			Defense += (int)(BaseDefense * percent);
-			break;
-		case "Energy":
-			Energy += (int)(BaseEnergy * percent);
-			break;
-		case "Resistance":
-			Resistance += (int)(BaseResistance * percent);
-			break;
-		case "Speed":
-			Speed += (int)(BaseSpeed * percent);
-			break;
-			// Advanced stats
-		case "Shield":
-			Shield += (int)(BaseShield * percent);
-			break;
-		case "Resilience":
-			Resilience += (int)(BaseResilience * percent);
-			break;
-		case "Retaliations":
-			Retaliations += (int)(BaseRetaliations * percent);
-			break;
-		case "RetaliationDamage":
-			RetaliationDamage += (int)(BaseRetaliationDamage * percent);
-			break;
-		case "ComboPoints":
-			ComboPoints += (int)(BaseComboPoints * percent);
-			break;
-		case "MaxComboPoints":
-			MaxComboPoints += (int)(BaseMaxComboPoints * percent);
-			break;
-		case "ActionPoints":
-			ActionPoints += (int)(BaseActionPoints * percent);
-			break;
-		case "MaxActionPoints":
-			MaxActionPoints += (int)(BaseMaxActionPoints * percent);
-			break;
-		case "GlobalCooldownReduction":
-			GlobalCooldownReduction += (int)(BaseGlobalCooldownReduction * percent);
-			break;
+	public void ReadyForTurn(){
+		YourTurn = true;
+		MadeSelection = false;
+		TurnComplete = false;
+		this.GetComponent<HighlightBlack> ().triggerColor = true;
+	}
+
+	public bool IsLegalMove(int distance){
+		int cost = (int)Mathf.Ceil (distance * MoveSpeed);
+		Debug.Log("Cost: " + cost + "|Points: " + Stats.ActionPoints + "|Distance: " + distance);
+		if (cost <= Stats.ActionPoints) {
+			Stats.ActionPoints -= cost;
+			return true;
+		} else {
+			return false;
 		}
 	}
 
-	public void UpdateBaseStats (string stat, int change){
-		switch (stat) {
-		// Base stats
-		case "Health":
-			BaseHealth += change;
-			break;
-		case "MaxHealth":
-			BaseMaxHealth += change;
-			break;
-		case "Attack":
-			BaseAttack += change;
-			break;
-		case "Defense":
-			BaseDefense += change;
-			break;
-		case "Energy":
-			BaseEnergy += change;
-			break;
-		case "Resistance":
-			BaseResistance += change;
-			break;
-		case "Speed":
-			BaseSpeed += change;
-			break;
-			// Advanced stats
-		case "Shield":
-			BaseShield += change;
-			break;
-		case "Resilience":
-			BaseResilience += change;
-			break;
-		case "Retaliations":
-			BaseRetaliations += change;
-			break;
-		case "RetaliationDamage":
-			BaseRetaliationDamage += change;
-			break;
-		case "ComboPoints":
-			BaseComboPoints += change;
-			break;
-		case "MaxComboPoints":
-			BaseMaxComboPoints += change;
-			break;
-		case "ActionPoints":
-			BaseActionPoints += change;
-			break;
-		case "MaxActionPoints":
-			BaseMaxActionPoints += change;
-			break;
-		case "GlobalCooldownReduction":
-			BaseGlobalCooldownReduction += change;
-			break;
+	public void MoveCharacter(GameObject newLocation){
+		destination = newLocation;
+		moving = true;
+		ChangeLocation ();
+	}
+
+	private void ChangeLocation(){
+		Location.GetComponent<HexCell>().occupant = null;
+		Location.GetComponent<HexCell>().occupied = false;
+		Location = destination;
+		Location.GetComponent<HexCell> ().occupied = true;
+		Location.GetComponent<HexCell>().occupant = this.gameObject;
+	}
+
+	private void EndTurn(){
+		MadeSelection = true;
+		TurnComplete = true;
+		moving = false;
+	}
+
+	void Update (){
+		if (moving) {
+			transform.position = Vector3.Lerp(transform.position, destination.transform.position, (moveAnimationSpeed * gameManager.GetComponent<GameSettingsManager>().gameSpeed) * Time.deltaTime);
+		}
+		if (moving && !MadeSelection && destination != null && this.transform.position == destination.transform.position) {
+			EndTurn ();
 		}
 	}
-
-	public void ResetStats (){
-		Health = BaseHealth;
-		MaxHealth = BaseMaxHealth;
-		Attack = BaseAttack;
-		Defense = BaseDefense;
-		Energy = BaseEnergy;
-		Resistance = BaseResistance;
-		Speed = BaseSpeed;
-
-		Shield = BaseShield;
-		Resilience = BaseResilience;
-		Retaliations = BaseRetaliations;
-		RetaliationDamage = BaseRetaliationDamage;
-		GlobalCooldownReduction = BaseGlobalCooldownReduction;
-	}
+		
 }

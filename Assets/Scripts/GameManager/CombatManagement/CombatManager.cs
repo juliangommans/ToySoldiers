@@ -12,15 +12,19 @@ public class CombatManager {
 		AfterCombat
 	}
 		
+	public TurnManager turnManager;
+
 //	private GameObject player;
 	private List<GameObject> playerCharacters;
 	private List<GameObject> enemyCharacters;
 	private CombatState combatState;
-	private TurnManager turnManager;
 	private int round;
-	private int frameCounter;
+//	private int frameCounter;
 	private GameObject enemy;
 	private CharacterManager characterManager;
+
+	// TEST
+	private bool testBool;
 
 	public void StartCombat () {
 //		player = p;
@@ -28,11 +32,10 @@ public class CombatManager {
 		turnManager = new TurnManager ();
 		combatState = CombatState.BeforeCombat;
 		round = 0;
-		frameCounter = 0;
+		testBool = false;
 	}
 
 	public void CheckCombat () {
-		frameCounter += 1;
 		switch (combatState) 
 		{
 		case CombatState.BeforeCombat:
@@ -40,7 +43,10 @@ public class CombatManager {
 			combatState = CombatState.BeginRound; // Testing purposes - SHOULD give options here.
 			break;
 		case CombatState.BeginRound:
-			turnManager.StartTurn (playerCharacters, enemyCharacters);
+			if (!testBool) {
+				turnManager.StartTurn (playerCharacters, enemyCharacters);
+				testBool = true;
+			}
 			round += 1;
 			combatState = CombatState.TurnManager;
 			break;

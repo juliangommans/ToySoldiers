@@ -51,6 +51,7 @@
      <Compile Include="Assets\Scripts\BaseScripts\BaseSchool.cs" />
      <Compile Include="Assets\Scripts\BaseScripts\BaseSkill.cs" />
      <Compile Include="Assets\Scripts\BaseScripts\BaseSkillEffects.cs" />
+     <Compile Include="Assets\Scripts\BaseScripts\BaseStats.cs" />
      <Compile Include="Assets\Scripts\Character\Enemies\DummyEnemy.cs" />
      <Compile Include="Assets\Scripts\Character\Player.cs" />
      <Compile Include="Assets\Scripts\GameManager\CharacterManager.cs" />
@@ -58,11 +59,13 @@
      <Compile Include="Assets\Scripts\GameManager\CombatManagement\CombatManager.cs" />
      <Compile Include="Assets\Scripts\GameManager\CombatManagement\TurnManager.cs" />
      <Compile Include="Assets\Scripts\GameManager\GameManager.cs" />
+     <Compile Include="Assets\Scripts\GameManager\GameSettingsManager.cs" />
      <Compile Include="Assets\Scripts\GameManager\GridManager.cs" />
      <Compile Include="Assets\Scripts\GameManager\InputManager.cs" />
      <Compile Include="Assets\Scripts\GameManager\SkillManager.cs" />
+     <Compile Include="Assets\Scripts\GameManager\UiManager.cs" />
      <Compile Include="Assets\Scripts\Grid\HexCell.cs" />
-     <Compile Include="Assets\Scripts\Grid\HexGrid.cs" />
+     <Compile Include="Assets\Scripts\Skills\IceBolt.cs" />
      <Compile Include="Assets\Scripts\Skills\IceStrike.cs" />
      <Compile Include="Assets\Scripts\SoftUI\ColorChanger.cs" />
      <Compile Include="Assets\Scripts\SoftUI\HighlightBlack.cs" />
