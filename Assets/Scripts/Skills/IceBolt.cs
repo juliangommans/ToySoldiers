@@ -8,7 +8,7 @@ public class IceBolt : BaseSkill {
 
 	public IceBolt()
 		:base(new BaseObjectInformation(name, description)){
-		this.TargetOther = true;
+		this.TargetEnemy = true;
 		this.Ranged = true;
 		this.Ethereal = true;
 	}

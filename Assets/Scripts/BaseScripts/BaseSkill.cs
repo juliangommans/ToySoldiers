@@ -4,94 +4,85 @@ using System.Collections.Generic;
 
 public class BaseSkill {
 
-	// Information
-	private BaseObjectInformation information;
-	private GameObject owner;
+	// private stats
+	private int  powerStat; // player.attack or player.power etc.
+	private int defenseStat;
+
+	// Objects
+	public BaseObjectInformation Information{ get; set; }
+	public GameObject Owner { get; set; }
+	public GameObject Target { get; set; }
 
 	// Combat Stats
-	private int power;
-	private int cost; // number of AP it costs to use
-	private int cooldown; // how many turns it takes before you can use it again (1 is every turn)
-	private float bonusMultiplier;
-	private BaseBonus bonus;
-	private GameObject target;
+	public int Power{ get; set; }
+	public int Cost{ get; set; } // number of AP it costs to use
+	public int Cooldown{ get; set; } // how many rounds it takes before you can use it again (1 is every round)
+	public int CooldownRemaining { get; set; }
+	public BaseBonus Bonus { get; set; }
+	public float BonusMultiplier { get; set; }
 
 	// Bool Checks
-	private bool targetOther;
-	private bool targetSelf;
-	private bool melee;
-	private bool ranged;
-	private bool corporeal; // "physical" - based off attack/defense
-	private bool ethereal; // "magical" - based of etheral damage/resistance
-	private bool singleTarget;
-
-	// Groups
-	private List<BaseSkillEffects> effects;
-	private BaseSchool school;
-
-	// Getters
-	public BaseObjectInformation Information{ get{ return information; } }
-	public GameObject Owner { get; set; }
-	public int Power{ get; set; }
-	public int Cost{ get; set; }
-	public int Cooldown{ get; set; }
-	public bool TargetOther{ get; set; }
-	public bool TargetSelf{ get; set; }
+	public bool OnCooldown{ get; set; }
+	public bool TargetEnemy{ get; set; }
+	public bool TargetFriend{ get; set; }
 	public bool Melee { get; set; }
 	public bool Ranged { get; set; }
-	public bool Corporeal { get; set; }
-	public bool Ethereal { get; set; }
+	public bool Corporeal { get; set; } // "physical" - based off attack/defense
+	public bool Ethereal { get; set; } // "magical" - based of power/resistance
 	public bool SingleTarget { get; set; }
-	public float BonusMultiplier { get; set; }
-	public GameObject Target { get; set; }
-	public BaseBonus Bonus { get; set; }
+
+	// Classifiers
 	public List<BaseSkillEffects> Effects { get; set; }
 	public BaseSchool School { get; set; }
 
 	public BaseSkill (BaseObjectInformation setInfo) {
-		information = setInfo;
+		Information = setInfo;
 		// defaults
-		effects = new List<BaseSkillEffects>();
-		power = 10;
-		cost = 2;
-		cooldown = 2;
-		bonusMultiplier = 1.5f;
+		Effects = new List<BaseSkillEffects>();
+		Power = 10;
+		Cost = 2;
+		Cooldown = 2;
+		BonusMultiplier = 1.5f;
+		CooldownRemaining = 0;
 
-		targetOther = false;
-		targetSelf = false;
-		melee = false;
-		ranged = false;
-		corporeal = false;
-		ethereal = false;
+		TargetEnemy = false;
+		TargetFriend = false;
+		Melee = false;
+		Ranged = false;
+		Corporeal = false;
+		Ethereal = false;
+		OnCooldown = false;
 	}
 
 	public BaseSkill (BaseObjectInformation setInfo, GameObject o) {
-		information = setInfo;
+		Information = setInfo;
 		this.Owner = o;
 		// defaults
-		effects = new List<BaseSkillEffects>();
-		power = 10;
-		cost = 2;
-		cooldown = 2;
-		bonusMultiplier = 1.5f;
+		Effects = new List<BaseSkillEffects>();
+		Power = 10;
+		Cost = 2;
+		Cooldown = 2;
+		BonusMultiplier = 1.5f;
+		CooldownRemaining = 0;
 
-		targetOther = false;
-		targetSelf = false;
-		melee = false;
-		ranged = false;
-		corporeal = false;
-		ethereal = false;
+		TargetEnemy = false;
+		TargetFriend = false;
+		Melee = false;
+		Ranged = false;
+		Corporeal = false;
+		Ethereal = false;
+		OnCooldown = false;
 	}
 
 	public bool AllowedTarget (GameObject tar, GameObject character){
-		if (TargetOther) {
+		if (TargetEnemy) {
 			if (tar.GetInstanceID() == character.GetInstanceID()){
 				return false;
 			}else{
 				return true;
 			}
 		}
-		if (TargetSelf) {
+		if (TargetFriend) {
 			if (tar.GetInstanceID() == character.GetInstanceID()){
 				return true;
 			}else{
@@ -102,9 +93,82 @@ public class BaseSkill {
 		return false;
 	}
 
-	public virtual void UseSkill() {
-		Debug.LogWarning ("NO SKILL BEHAVIOUR ADDED");
+	public void UseSkill() {
+		// Might want to add some sort of precurser "special effects" method here?
+		ActivateSkillEffects();
+		if (TargetFriend) {
+			if (Power == 0) {
+				BuffLogic ();
+			} else {
+				HealLogic ();
+			}
+		} else {
+			if (Power == 0) {
+				DebuffLogic ();
+			} else {
+				DamageLogic ();
+			}
+		}
+		ResolveSkill ();
 	}
 
+	public virtual void ActivateSkillEffects(){
+		Debug.LogWarning ("NO CUSTOM SKILL EFFECTS ADDED");
+	}
+
+	private void BuffLogic(){
+		// Insert buff logic here
+	}
+
+	private void DebuffLogic(){
+		//insert DEbuff logic here
+	}
+
+	private void HealLogic(){
+		HealStats ();
+		this.Target.GetComponent<BaseCharacter> ().Stats.ChangeHealth (PowerCalculation());
+	}
+
+	private void HealStats(){
+		if (this.Corporeal){
+			powerStat = this.Owner.GetComponent<BaseCharacter> ().Stats.Attack;
+
+		} else{
+			powerStat = this.Owner.GetComponent<BaseCharacter> ().Stats.Power;
+		}
+		defenseStat = this.Target.GetComponent<BaseCharacter> ().Stats.Defense + this.Target.GetComponent<BaseCharacter> ().Stats.Resistance;
+	}
+
+	private void DamageLogic(){
+		DamageStats ();
+		DeductDamage (PowerCalculation ());
+	}
+
+	private void DamageStats(){
+		if (this.Corporeal){
+			 powerStat = this.Owner.GetComponent<BaseCharacter> ().Stats.Attack;
+			defenseStat = this.Target.GetComponent<BaseCharacter> ().Stats.Defense;
+		} else{
+			 powerStat = this.Owner.GetComponent<BaseCharacter> ().Stats.Power;
+			defenseStat = this.Target.GetComponent<BaseCharacter> ().Stats.Resistance;
+		}
+	}
+
+	private int PowerCalculation (){
+		float damage = Power *  powerStat / defenseStat;
+		int rounded = (int)Mathf.Floor (damage / 2); // globabl constant in order to prevent huge damage spikes.
+		return rounded;
+	}
+
+	private void DeductDamage (int damage){
+		this.Target.GetComponent<BaseCharacter> ().Stats.TakeDamage (damage);
+		Debug.Log ("" + this.Target.name + " should be taking " + damage + " damage from health"); 
+	}
+
+	private void ResolveSkill (){
+		this.Owner.GetComponent<BaseCharacter> ().Stats.ActionPoints -= Cost;
+		OnCooldown = true;
+		CooldownRemaining = Cooldown;
+	}
 
 }

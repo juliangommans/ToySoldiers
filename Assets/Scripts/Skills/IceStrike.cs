@@ -8,7 +8,7 @@ public class IceStrike : BaseSkill {
 
 	public IceStrike()
 		:base(new BaseObjectInformation(name, description)){
-		this.TargetOther = true;
+		this.TargetEnemy = true;
 		this.Melee = true;
 		this.Corporeal = true;
 	}

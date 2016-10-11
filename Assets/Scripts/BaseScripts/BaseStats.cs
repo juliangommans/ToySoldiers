@@ -39,7 +39,7 @@ public class BaseStats : MonoBehaviour {
 	public int GlobalCooldownReduction {get; set;}
 	public int BaseGlobalCooldownReduction {get; set;}
 
-	void UpdateStats (string stat, float percent){
+	void UpdateStatsWithMultiplier (string stat, float percent){
 		switch (stat) {
 		// Base stats * modifiers
 		case "Health":
@@ -94,7 +94,7 @@ public class BaseStats : MonoBehaviour {
 		}
 	}
 
-	public void UpdateBaseStats (string stat, int change){
+	public void PermanentlyUpdateBaseStats (string stat, int change){
 		switch (stat) {
 		// Base stats +/- flat amount
 		case "Health":
@@ -147,6 +147,24 @@ public class BaseStats : MonoBehaviour {
 			BaseGlobalCooldownReduction += change;
 			break;
 		}
+	}
+
+	public void TakeDamage(int amount){
+		if (Shield > 0) {
+			int difference = Shield - amount;
+			if (difference < 0) {
+				Shield = 0;
+				ChangeHealth (difference);
+			} else {
+				Shield -= amount;
+			}
+		} else {
+			ChangeHealth (-amount);
+		}
+	}
+
+	public void ChangeHealth (int amount){
+		Health += amount;
 	}
 
 	public void ResetStats (){

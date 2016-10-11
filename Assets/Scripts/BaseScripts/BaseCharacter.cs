@@ -84,6 +84,7 @@ public class BaseCharacter : MonoBehaviour {
 	public void AddSkill (BaseSkill skill) {
 		skill.Owner = this.gameObject;
 		Skills.Add (skill);
+		//instantiate a butotn and it's scripts
 	}
 
 	public void ReadyForTurn(){
@@ -93,6 +94,7 @@ public class BaseCharacter : MonoBehaviour {
 		this.GetComponent<HighlightBlack> ().triggerColor = true;
 	}
 
+// Movement Logic
 	public bool IsLegalMove(int distance){
 		int cost = (int)Mathf.Ceil (distance * MoveSpeed);
 		Debug.Log("Cost: " + cost + "|Points: " + Stats.ActionPoints + "|Distance: " + distance);
@@ -118,6 +120,12 @@ public class BaseCharacter : MonoBehaviour {
 		Location.GetComponent<HexCell>().occupant = this.gameObject;
 	}
 
+	public void SelectSkill (BaseSkill s) {
+		MadeSelection = true;
+		SelectedSkill = s;
+	}
+
+// End turn - called whenever any AP spending action is performed
 	private void EndTurn(){
 		MadeSelection = true;
 		TurnComplete = true;
