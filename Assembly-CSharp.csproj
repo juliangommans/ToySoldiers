@@ -58,6 +58,7 @@
      <Compile Include="Assets\Scripts\ManagementScripts\CharacterManager.cs" />
      <Compile Include="Assets\Scripts\ManagementScripts\CombatManagement\CombatControlsManager.cs" />
      <Compile Include="Assets\Scripts\ManagementScripts\CombatManagement\CombatManager.cs" />
+     <Compile Include="Assets\Scripts\ManagementScripts\CombatManagement\DmgAndHealManager.cs" />
      <Compile Include="Assets\Scripts\ManagementScripts\CombatManagement\TurnManager.cs" />
      <Compile Include="Assets\Scripts\ManagementScripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\ManagementScripts\GameSettingsManager.cs" />
@@ -69,8 +70,14 @@
      <Compile Include="Assets\Scripts\ManagementScripts\UiManagement\SkillPopout.cs" />
      <Compile Include="Assets\Scripts\ManagementScripts\UiManagement\SkillUiManager.cs" />
      <Compile Include="Assets\Scripts\ManagementScripts\UiManagement\UiManager.cs" />
+     <Compile Include="Assets\Scripts\Schools\FireSchool.cs" />
+     <Compile Include="Assets\Scripts\Schools\IceSchool.cs" />
+     <Compile Include="Assets\Scripts\Schools\LightningSchool.cs" />
+     <Compile Include="Assets\Scripts\SkillEffects\Freeze.cs" />
+     <Compile Include="Assets\Scripts\Skills\DefensiveSkills\Block.cs" />
      <Compile Include="Assets\Scripts\Skills\IceBolt.cs" />
      <Compile Include="Assets\Scripts\Skills\IceStrike.cs" />
+     <Compile Include="Assets\Scripts\Skills\SkillTemplates\BoltSkill.cs" />
      <Compile Include="Assets\Scripts\SoftUI\ColorChanger.cs" />
      <Compile Include="Assets\Scripts\SoftUI\HighlightBlack.cs" />
      <Compile Include="Assets\Scripts\TempGridHelpers\GroundLogic.cs" />

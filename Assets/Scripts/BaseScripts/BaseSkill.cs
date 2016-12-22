@@ -5,8 +5,7 @@ using System.Collections.Generic;
 public class BaseSkill {
 
 	// private stats
-	private int  powerStat; // player.attack or player.power etc.
-	private int defenseStat;
+	private DmgAndHealManager dmgAndHealManager;
 
 	// Objects
 	public BaseObjectInformation Information{ get; set; }
@@ -25,6 +24,7 @@ public class BaseSkill {
 	public bool OnCooldown{ get; set; }
 	public bool TargetEnemy{ get; set; }
 	public bool TargetFriend{ get; set; }
+	public bool TargetGround{ get; set; }
 	public bool Melee { get; set; }
 	public bool Ranged { get; set; }
 	public bool Corporeal { get; set; } // "physical" - based off attack/defense
@@ -34,9 +34,10 @@ public class BaseSkill {
 	// Classifiers
 	public List<BaseSkillEffects> Effects { get; set; }
 	public BaseSchool School { get; set; }
+	public int Level;
 
-	public BaseSkill (BaseObjectInformation setInfo) {
-		Information = setInfo;
+	public BaseSkill () {
+		Information = new BaseObjectInformation("skill", "description");
 		// defaults
 		Effects = new List<BaseSkillEffects>();
 		Power = 10;
@@ -44,37 +45,58 @@ public class BaseSkill {
 		Cooldown = 2;
 		BonusMultiplier = 1.5f;
 		CooldownRemaining = 0;
+		Level = 1;
 
 		TargetEnemy = false;
 		TargetFriend = false;
+		TargetGround = false;
 		Melee = false;
 		Ranged = false;
 		Corporeal = false;
 		Ethereal = false;
 		OnCooldown = false;
+
+		dmgAndHealManager = new DmgAndHealManager(this);
 	}
 
-	public BaseSkill (BaseObjectInformation setInfo, GameObject o) {
-		Information = setInfo;
-		this.Owner = o;
-		// defaults
-		Effects = new List<BaseSkillEffects>();
-		Power = 10;
-		Cost = 2;
-		Cooldown = 2;
-		BonusMultiplier = 1.5f;
-		CooldownRemaining = 0;
-
-		TargetEnemy = false;
-		TargetFriend = false;
-		Melee = false;
-		Ranged = false;
-		Corporeal = false;
-		Ethereal = false;
-		OnCooldown = false;
+	public string Targets(){
+		string targets = "";
+		if (TargetEnemy) {
+			targets += " Enemy";
+		}		
+		if (TargetFriend) {
+			targets += " Friend";
+		}
+		if (TargetGround) {
+			targets += " Ground";
+		}
+		if (targets.Length > 0) {
+			targets.Substring (1);
+		}
+		return targets;
 	}
 
-	public bool AllowedTarget (GameObject tar, GameObject character){
+	public bool AllowedTarget (GameObject t, GameObject c){
+		if (TargetGround) {
+			if (t.tag == "HexCell") {
+				return true;
+			} else {
+				// if aoe and target another character, we allow it to return true
+				if (TargetCharacter (t, c)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+		if (TargetCharacter (t, c)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private bool TargetCharacter(GameObject tar, GameObject character){
 		if (TargetEnemy) {
 			if (tar.GetInstanceID() == character.GetInstanceID()){
 				return false;
@@ -100,14 +122,16 @@ public class BaseSkill {
 			if (Power == 0) {
 				BuffLogic ();
 			} else {
-				HealLogic ();
+				dmgAndHealManager.HealLogic ();
 			}
-		} else {
+		} else if (TargetEnemy) {
 			if (Power == 0) {
 				DebuffLogic ();
 			} else {
-				DamageLogic ();
+				dmgAndHealManager.DamageLogic();
 			}
+		} else if (TargetGround) {
+			// move skills, utility skills and aoe skills
 		}
 		ResolveSkill ();
 	}
@@ -122,47 +146,6 @@ public class BaseSkill {
 
 	private void DebuffLogic(){
 		//insert DEbuff logic here
-	}
-
-	private void HealLogic(){
-		HealStats ();
-		this.Target.GetComponent<BaseCharacter> ().Stats.ChangeHealth (PowerCalculation());
-	}
-
-	private void HealStats(){
-		if (this.Corporeal){
-			powerStat = this.Owner.GetComponent<BaseCharacter> ().Stats.Attack;
-
-		} else{
-			powerStat = this.Owner.GetComponent<BaseCharacter> ().Stats.Power;
-		}
-		defenseStat = this.Target.GetComponent<BaseCharacter> ().Stats.Defense + this.Target.GetComponent<BaseCharacter> ().Stats.Resistance;
-	}
-
-	private void DamageLogic(){
-		DamageStats ();
-		DeductDamage (PowerCalculation ());
-	}
-
-	private void DamageStats(){
-		if (this.Corporeal){
-			 powerStat = this.Owner.GetComponent<BaseCharacter> ().Stats.Attack;
-			defenseStat = this.Target.GetComponent<BaseCharacter> ().Stats.Defense;
-		} else{
-			 powerStat = this.Owner.GetComponent<BaseCharacter> ().Stats.Power;
-			defenseStat = this.Target.GetComponent<BaseCharacter> ().Stats.Resistance;
-		}
-	}
-
-	private int PowerCalculation (){
-		float damage = Power *  powerStat / defenseStat;
-		int rounded = (int)Mathf.Floor (damage / 2); // globabl constant in order to prevent huge damage spikes.
-		return rounded;
-	}
-
-	private void DeductDamage (int damage){
-		this.Target.GetComponent<BaseCharacter> ().Stats.TakeDamage (damage);
-		Debug.Log ("" + this.Target.name + " should be taking " + damage + " damage from health"); 
 	}
 
 	private void ResolveSkill (){

@@ -7,10 +7,12 @@ public class IceBolt : BaseSkill {
 	private const string description = "A ranged ethereal spell that deals cold damage";
 
 	public IceBolt()
-		:base(new BaseObjectInformation(name, description)){
+		:base(){
 		this.TargetEnemy = true;
 		this.Ranged = true;
 		this.Ethereal = true;
+		this.School = new IceSchool ();
+		this.Information = new BaseObjectInformation (name, description);
 	}
 
 }

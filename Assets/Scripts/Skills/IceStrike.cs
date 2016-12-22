@@ -7,9 +7,11 @@ public class IceStrike : BaseSkill {
 	private const string description = "A melee physical attack that deals cold damage";
 
 	public IceStrike()
-		:base(new BaseObjectInformation(name, description)){
+		:base(){
 		this.TargetEnemy = true;
 		this.Melee = true;
 		this.Corporeal = true;
+		this.School = new IceSchool();
+		this.Information = new BaseObjectInformation (name, description);
 	}
 }

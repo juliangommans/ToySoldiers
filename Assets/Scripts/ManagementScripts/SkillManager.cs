@@ -28,19 +28,23 @@ public class SkillManager : MonoBehaviour {
 	}
 
 	public void SelectSkill(){
-		selected = false;
-		target = character.GetComponent<BaseCharacter> ().CurrentTarget;
-		if (target != null) {
-			SelectTarget ();
-			if (skill.Target != null) {
-				character.GetComponent<BaseCharacter> ().MadeSelection = true;
-				selected = true;
-				character.GetComponent<BaseCharacter> ().SelectSkill(skill);
-				Debug.Log (character.GetComponent<BaseCharacter> ().name + ": Has selected - " + skill.Information.Name);
-				UseSkill ();
-			}
+		if (skill.OnCooldown) {
+			Debug.Log ("skills on cooldown brah");
 		} else {
-			Debug.Log ("target is nill");
+			selected = false;
+			target = character.GetComponent<BaseCharacter> ().CurrentTarget;
+			if (target != null) {
+				SelectTarget ();
+				if (skill.Target != null) {
+					character.GetComponent<BaseCharacter> ().MadeSelection = true;
+					selected = true;
+					character.GetComponent<BaseCharacter> ().SelectSkill (skill);
+					Debug.Log (character.GetComponent<BaseCharacter> ().name + ": Has selected - " + skill.Information.Name);
+					UseSkill ();
+				}
+			} else {
+				Debug.Log ("target is nill");
+			}
 		}
 	}
 
@@ -55,6 +59,8 @@ public class SkillManager : MonoBehaviour {
 	}
 
 	public void DisplayInfo(){
+		Debug.Log (transform.parent.transform.GetChild (1).name);
+		transform.parent.transform.GetChild (1).gameObject.SetActive (true);
 	}
 
 	public void UseSkill(){

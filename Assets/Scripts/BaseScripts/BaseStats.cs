@@ -38,8 +38,9 @@ public class BaseStats : MonoBehaviour {
 	public int BaseMaxActionPoints {get; set;}
 	public int GlobalCooldownReduction {get; set;}
 	public int BaseGlobalCooldownReduction {get; set;}
+	public float SameSchoolBonus { get; set; }
 
-	void UpdateStatsWithMultiplier (string stat, float percent){
+	public void UpdateStatsWithMultiplier (string stat, float percent){
 		switch (stat) {
 		// Base stats * modifiers
 		case "Health":

@@ -14,7 +14,7 @@ public class BaseBonus : BaseSkillEffects {
 
 	public BaseBonus(string name, string description)
 		:base(new BaseObjectInformation(name,description)){
-		multiplier = 1.5f;
+		multiplier = 0.5f;
 		this.Effects = new List<BaseSkillEffects> ();
 	}
 

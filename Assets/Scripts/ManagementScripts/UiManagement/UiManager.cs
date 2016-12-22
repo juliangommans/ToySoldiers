@@ -59,21 +59,55 @@ public class UiManager : MonoBehaviour {
 		str += "<color=" + color + ">" + currentStat + "</color>/";
 		str += maxStat;
 		newStat.GetComponent<Text> ().text = str;
-
 	}
 
 	private void BuildSkillButtons(){
 		// builds butotns at run time
 		int buttonCount = userCharacter.GetComponent<BaseCharacter> ().Skills.Count;
 		GameObject parentPanel = GameObject.Find("SkillPopoutPanel");
-			for (int i = 0; i < buttonCount; i++) {
-			GameObject skillButton = (GameObject)Instantiate (buttonPrefab);
+		GameObject canvas = GameObject.Find("Canvas");
+		for (int i = 0; i < buttonCount; i++) {
+			GameObject skillButtonWrapper = (GameObject)Instantiate (buttonPrefab);
+			GameObject skillButton = skillButtonWrapper.transform.GetChild (0).gameObject;
+			GameObject skillDescription = skillButtonWrapper.transform.GetChild (1).gameObject;
 			GameObject buttonSlot = GameObject.Find("SkillSlot" + i);
 			BaseSkill currentSkill = userCharacter.GetComponent<BaseCharacter> ().Skills [i];
-			skillButton.transform.SetParent(parentPanel.transform, false);
-			skillButton.transform.position = buttonSlot.transform.position;
+			BuildSkillDescription (skillDescription, currentSkill);
+			skillButtonWrapper.transform.SetParent(canvas.transform, false);
+			skillButtonWrapper.transform.position = buttonSlot.transform.position;
 			skillButton.transform.GetChild (0).GetComponent<Text> ().text = currentSkill.Information.Name;
 			skillButton.GetComponent<SkillManager> ().SkillSetup (userCharacter, currentSkill);
 		}
+	}
+
+	private void BuildSkillDescription(GameObject desc, BaseSkill skill){
+		// similar to how we do the character/target ui.
+		desc.transform.FindChild("Name").GetComponent<Text> ().text = skill.Information.Name;
+		BuildSkillStatString(desc,"School",skill.School.Information.Name);
+		BuildSkillStatString(desc,"Power","" + skill.Power);
+		BuildSkillStatString(desc,"Cost","" + skill.Cost);
+		BuildSkillStatString(desc,"Cooldown","" + skill.Cooldown);
+		string realm;
+		if (skill.Corporeal) {
+			realm = "Corporeal";
+		} else {
+			realm = "Ethereal";
+		}
+		BuildSkillStatString(desc,"Realm",realm);
+		string proximity;
+		if (skill.Ranged) {
+			proximity = "Ranged";
+		} else {
+			proximity = "Melee";
+		}
+		BuildSkillStatString(desc,"Proximity",proximity);
+		BuildSkillStatString(desc,"Targets",skill.Targets());
+		desc.SetActive (false);
+	}
+
+	private void BuildSkillStatString(GameObject desc, string skillStat, string statValue){
+		GameObject ss = desc.transform.FindChild(skillStat).gameObject;
+		string newString = "" + skillStat + ": " + statValue;
+		ss.GetComponent<Text> ().text = newString;
 	}
 }

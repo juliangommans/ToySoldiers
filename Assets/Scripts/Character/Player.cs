@@ -10,11 +10,12 @@ public class Player : BaseCharacter {
 	public Player ()
 		:base (){
 		this.CharacterName = name;
-
 	}
 
 	void Awake (){
+		this.Schools.Add (new IceSchool ());
 		this.AddSkill (new IceBolt());
+		this.AddSkill (new BoltSkill(new LightningSchool()));
 	}
 
 		

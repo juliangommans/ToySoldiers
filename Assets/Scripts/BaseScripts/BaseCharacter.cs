@@ -11,14 +11,15 @@ public class BaseCharacter : MonoBehaviour {
 	private GameObject gameManager;
 
 	// Character skills/abilities etc.
-	public string CharacterName {get; set;}
-	public List<BaseSkill> Skills {get; set;}
+	public string CharacterName { get; set; }
+	public List<BaseSchool> Schools { get; set; }
+	public List<BaseSkill> Skills { get; set; }
 	public BaseSkill SelectedSkill { get; set; }
 	public BaseStats Stats { get; set; }
 
 	// Character passive modifiers - might need to impliment/learn about c# lists
-	public List<GameObject> buffs;
-	public List<GameObject> deBuffs;
+	public List<BaseSkillEffects> Buffs;
+	public List<BaseSkillEffects> DeBuffs;
 
 	// Interactive variables
 	public bool MadeSelection { get; set; }
@@ -48,6 +49,7 @@ public class BaseCharacter : MonoBehaviour {
 		CharacterName = "Character";
 		Stats = new BaseStats ();
 		Skills = new List<BaseSkill>();
+		Schools = new List<BaseSchool>();
 
 		Stats.BaseHealth = 300;
 		Stats.BaseMaxHealth = 300;
@@ -66,6 +68,7 @@ public class BaseCharacter : MonoBehaviour {
 		Stats.BaseActionPoints = 4;
 		Stats.BaseMaxActionPoints = 4;
 		Stats.BaseGlobalCooldownReduction = 0;
+		Stats.SameSchoolBonus = 0.1f;
 
 		MoveSpeed = 0.5f;
 

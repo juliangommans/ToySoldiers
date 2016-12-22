@@ -21,5 +21,9 @@ public class DummyEnemy : BaseCharacter {
 		this.CharacterName = name;
 //		this.Skills.Add (new TouchOfFlame (this.gameObject));
 	}
+
+	void Awake(){
+		this.Schools.Add (new FireSchool ());
+	}
 }
 
